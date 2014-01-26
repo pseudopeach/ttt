@@ -21,7 +21,7 @@ class TttAI
     puts "Finished tabulation in #{@iteration_count} calls."
     
     #pick the one that looses the least, breaking ties by drawing the least
-    best = choices.sort_by { |c| [-c[:worst_case], c[@playing_mark]] }.first
+    best = choices.sort_by { |c| [-c[:worst], -c[@playing_mark]] }.first
     return best[:move]
   end
   
@@ -33,13 +33,19 @@ class TttAI
     end
     
     @iteration_count += 1
-    out = {x: 0, o: 0, cat:0, worst_case: 0}
+    out = {x: 0, o: 0, cat:0}
     
     if w = state.winner
       out[w] = 1
-      out[:worst_case] = -1 if w == @opponent
-      out[:worst_case] = 1 if w == @playing_mark
-      #puts "winner #{w} #{out[:worst_case]}"
+      case w
+      when @opponent
+        out[:worst] = -1
+      when @playing_mark
+        out[:worst] = 1
+      else
+        out[:worst] = 0
+      end
+      #puts "winner #{w} #{out[:worst]}"
       return out
     end
     
@@ -52,13 +58,13 @@ class TttAI
       
       #if it's the other player's turn assume the pick the worst, and vice versa
       if state.next_turn_taker == @opponent
-        out[:worst_case] = outcomes[:worst_case] if outcomes[:worst_case] < out[:worst_case]
+        out[:worst] = outcomes[:worst] if (!out[:worst] || (outcomes[:worst] < out[:worst]))
       else
-        out[:worst_case] = outcomes[:worst_case] if outcomes[:worst_case] > out[:worst_case]
-        puts "on computer turn: move worst:#{outcomes[:worst_case]} output worst:#{out[:worst_case]}"
-      end    
+        out[:worst] = outcomes[:worst] if (!out[:worst] || (outcomes[:worst] > out[:worst]))
+        #puts "on computer turn: move worst:#{outcomes[:worst]} output worst:#{out[:worst]}"
+      end
     end
-    
+  
     cache_solution(state, out)
     
     return out

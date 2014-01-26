@@ -39,7 +39,7 @@ def play_game(human_first)
   #display outcome
   HumanPlayer.print_board(game)
   if winner == cplays
-    puts "HAHAHA! Your feeble human brain is not match for my recursive power!!"
+    puts "HAHAHA! Your feeble human brain is no match for my recursive power!!"
   elsif winner == :cat
     puts "It's a Tie... That seems to happen a lot in this game :-/"
   else

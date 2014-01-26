@@ -21,7 +21,7 @@ raise "illegal move deemed legal" if b.legal_moves.member?(b2)
 ai = TttAI.new(:o)
 #must make move that prevents immediate loss
 raise "AI is stupid" unless ai.move(b).hash == 102948
-b = GameState.new 8724
+b = GameState.new 0
 ai = TttAI.new(:x)
 b.legal_moves.each do |m|
   puts m.hash
