@@ -23,20 +23,28 @@ class GameState
   ]
   
   def initialize(bits=0)
-    @board_bits = bits
+    if bits && bits.is_a?(GameState)
+      @board_bits = bits.hash
+    else
+      @board_bits = bits
+    end 
   end
   
   def play
     raise "Player list invalid." unless @players.key?(:x) && @players.key?(:o)
-    raise "Players must respond to move method" unless @players.values.inject(true){|memo, v| v.respond_to? :move}
+    raise "Players must respond to move method" unless @players.values.inject(true){|memo, v| memo && v.respond_to?(:move)}
+    
+    #X starts
     current_player = :x
+    
     #alternate turns until someone wins
     while(!winner) do
       move = players[current_player].move(self)
       raise "Illegal move!" unless legal_moves.member?(move)
-      board_bits = move
+      @board_bits = move.board_bits
       current_player = current_player == :x ? :o : :x
     end
+    
     return winner
   end
   
