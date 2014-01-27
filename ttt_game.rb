@@ -1,6 +1,6 @@
 require 'Set'
 
-# test 37476
+# board state is stored as a single bit array, for quick copying and minimal RAM use durring recursion
 class GameState
   attr_accessor :board_bits, :players
   

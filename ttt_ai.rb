@@ -1,7 +1,6 @@
 require './ttt_game.rb'
 
 class TttAI
-
   def initialize(playing_mark)
     @opponent = playing_mark == :o ? :x : :o
     @playing_mark = playing_mark
@@ -9,6 +8,7 @@ class TttAI
     @TAB_CACHE = {}
   end
   
+  #return a move (BoardState) given [state]
   def move(state)
     @iteration_count = 0
     #make an array of all possible moves
@@ -20,14 +20,14 @@ class TttAI
     end
     puts "Finished tabulation in #{@iteration_count} calls."
     
-    #pick the one that looses the least, breaking ties by drawing the least
+    #pick best worst case scenario
     best = choices.sort_by { |c| [-c[:worst], -c[@playing_mark]] }.first
     return best[:move]
   end
   
+  #for a given state, tabulate all possible outcomes
   def tabulate_outcomes(state)
-    
-    #return early if we have a pre-tabulated solution
+    #return early if we have a cached solution for the given [state]
     if out = @TAB_CACHE[state.board_bits]
       return out
     end
@@ -35,17 +35,18 @@ class TttAI
     @iteration_count += 1
     out = {x: 0, o: 0, cat:0}
     
+    #if this state has a winner, it's easy
     if w = state.winner
       out[w] = 1
       case w
-      when @opponent
-        out[:worst] = -1
-      when @playing_mark
-        out[:worst] = 1
-      else
-        out[:worst] = 0
+        when @opponent
+          out[:worst] = -1
+        when @playing_mark
+          out[:worst] = 1
+        else
+          out[:worst] = 0
       end
-      #puts "winner #{w} #{out[:worst]}"
+      
       return out
     end
     
@@ -56,12 +57,11 @@ class TttAI
       #raw counts
       [:x, :o, :cat].each {|k| out[k] += outcomes[k]}
       
-      #if it's the other player's turn assume the pick the worst, and vice versa
+      #if it's the other player's turn assume they make the best move they can, and vice versa
       if state.next_turn_taker == @opponent
         out[:worst] = outcomes[:worst] if (!out[:worst] || (outcomes[:worst] < out[:worst]))
       else
         out[:worst] = outcomes[:worst] if (!out[:worst] || (outcomes[:worst] > out[:worst]))
-        #puts "on computer turn: move worst:#{outcomes[:worst]} output worst:#{out[:worst]}"
       end
     end
   
