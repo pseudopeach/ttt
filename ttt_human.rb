@@ -29,7 +29,7 @@ class HumanPlayer
   def move(state)
     HumanPlayer.print_board(state)
     begin
-      puts "Your turn. Choose a space."
+      puts "Your turn. Choose a space. (you are #{state.next_turn_taker.to_s.upcase})"
       space_num = gets.chomp!.to_i
       b = GameState.new(state)
       b.mark_index(space_num-1, @mark)
