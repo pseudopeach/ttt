@@ -1,3 +1,4 @@
+require './ttt_game.rb'
 class HumanPlayer
   
   def initialize(mark)
